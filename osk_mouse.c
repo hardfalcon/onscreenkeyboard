@@ -25,6 +25,7 @@
 #include <linux/input.h>
 #include <linux/ioctl.h>
 #include <linux/uinput.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -43,27 +44,28 @@
 
 unsigned char abc[] = {KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9, KEY_0, KEY_Q, KEY_W, KEY_E, KEY_R, KEY_T, KEY_Y, KEY_U, KEY_I, KEY_O, KEY_P, KEY_A, KEY_S, KEY_D, KEY_F, KEY_G, KEY_H, KEY_J, KEY_K, KEY_L, KEY_ENTER, KEY_Z, KEY_X, KEY_C, KEY_V, KEY_B, KEY_N, KEY_M, KEY_COMMA, KEY_DOT, KEY_ENTER, 0, KEY_SPACE, KEY_SPACE, KEY_SPACE, KEY_COMMA, KEY_DOT, KEY_DOT, KEY_DOT, KEY_DOT, KEY_BACKSPACE};
 
+extern uint8_t _binary_image_mouse_ppm_start[];
+extern uint8_t _binary_image_mouse_ppm_end;
+extern uint8_t _binary_image_mouse_ppm_size;
 
 
 
 /*
  *	Draw image from PPM file
  */
-static void fb_drawimage(const char *filename, char *fbp, int xo, int yo, int bpp, int length, int xres) 
+static void fb_drawimage(FILE *theme_file, char *fbp, int xo, int yo, int bpp, int length, int xres) 
 {
 	char head[256];
 	char s[80];
-	FILE *theme_file;
 	unsigned char *pixline;
 	unsigned i, j, width, height, line_size;
 
 	memset(head, 0, sizeof(head));
-	theme_file = fopen(filename, "r");
 
 	/* parse ppm header */
 	while (1) {
 		if (fgets(s, sizeof(s), theme_file) == NULL) {
-			printf("bad PPM file '%s'", filename);
+			printf("bad PPM file");
 			exit(1);
 		}
 
@@ -71,13 +73,13 @@ static void fb_drawimage(const char *filename, char *fbp, int xo, int yo, int bp
 			continue;
 
 		if (strlen(head) + strlen(s) >= sizeof(head)) {
-			printf("bad PPM file '%s'", filename);
+			printf("bad PPM file");
 			exit(1);
 		}
 
 		strcat(head, s);
 		if (head[0] != 'P' || head[1] != '6') {
-			printf("bad PPM file '%s'", filename);
+			printf("bad PPM file");
 			exit(1);
 		}
 
@@ -95,7 +97,7 @@ static void fb_drawimage(const char *filename, char *fbp, int xo, int yo, int bp
 		unsigned char *pixel = pixline;
 
 		if (fread(pixline, 1, line_size, theme_file) != line_size) {
-			printf("bad PPM file '%s'", filename);
+			printf("bad PPM file");
 			exit(1);
 		}
 
@@ -262,8 +264,8 @@ int main(void) {
 
 	while(1) {
 
-		fb_drawimage("image_mouse.ppm", fbp, vinfo.xoffset, vinfo.yoffset, vinfo.bits_per_pixel, finfo.line_length, vinfo.xres);
-
+		FILE *theme_file=fmemopen(_binary_image_mouse_ppm_start, (size_t)&_binary_image_mouse_ppm_size, "r");
+		fb_drawimage(theme_file, fbp, vinfo.xoffset, vinfo.yoffset, vinfo.bits_per_pixel, finfo.line_length, vinfo.xres);
 
 		/* check mouse */
 

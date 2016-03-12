@@ -26,6 +26,7 @@
 #include <linux/input.h>
 #include <linux/ioctl.h>
 #include <linux/uinput.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -78,27 +79,28 @@
 
 unsigned char abc[] = {30, 48, 46, 32, 18, 33, 34, 35, 23, 36, 37, 38, 50, 49, 24, 25, 16, 19, 31, 20, 22, 47, 17, 45, 21, 44, 28};
 
+extern uint8_t _binary_image_ppm_start[];
+extern uint8_t _binary_image_ppm_end;
+extern uint8_t _binary_image_ppm_size;
 
 
 
 /*
  *	Draw image from PPM file
  */
-static void fb_drawimage(const char *filename, char *fbp, int xo, int yo, int bpp, int length) 
+static void fb_drawimage(FILE *theme_file, char *fbp, int xo, int yo, int bpp, int length)
 {
 	char head[256];
 	char s[80];
-	FILE *theme_file;
 	unsigned char *pixline;
 	unsigned i, j, width, height, line_size;
 
 	memset(head, 0, sizeof(head));
-	theme_file = fopen(filename, "r");
 
 	/* parse ppm header */
 	while (1) {
 		if (fgets(s, sizeof(s), theme_file) == NULL) {
-			printf("bad PPM file '%s'", filename);
+			printf("bad PPM file");
 			exit(1);
 		}
 
@@ -106,13 +108,13 @@ static void fb_drawimage(const char *filename, char *fbp, int xo, int yo, int bp
 			continue;
 
 		if (strlen(head) + strlen(s) >= sizeof(head)) {
-			printf("bad PPM file '%s'", filename);
+			printf("bad PPM file");
 			exit(1);
 		}
 
 		strcat(head, s);
 		if (head[0] != 'P' || head[1] != '6') {
-			printf("bad PPM file '%s'", filename);
+			printf("bad PPM file");
 			exit(1);
 		}
 
@@ -130,7 +132,7 @@ static void fb_drawimage(const char *filename, char *fbp, int xo, int yo, int bp
 		unsigned char *pixel = pixline;
 
 		if (fread(pixline, 1, line_size, theme_file) != line_size) {
-			printf("bad PPM file '%s'", filename);
+			printf("bad PPM file");
 			exit(1);
 		}
 
@@ -275,8 +277,8 @@ int main(void) {
 		m++;
 		if (m==29) m=0; /* 27 keys, and 2 extra seconds for exit */
 
-
-		fb_drawimage("image.ppm", fbp, vinfo.xoffset, vinfo.yoffset, vinfo.bits_per_pixel, finfo.line_length);
+		FILE *theme_file=fmemopen(_binary_image_ppm_start, (size_t)&_binary_image_ppm_size, "r");
+		fb_drawimage(theme_file, fbp, vinfo.xoffset, vinfo.yoffset, vinfo.bits_per_pixel, finfo.line_length);
 
 		for (j=0;j<54;j=j+2) {
      		for (y = 20; y < 30; y++)
