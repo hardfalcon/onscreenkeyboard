@@ -171,7 +171,13 @@ int send_event(int fd, __u16 type, __u16 code, __s32 value)
 
 
 
-int main(void) {
+int main( uint argc, char *argv[] ) {
+
+	if( argc != 2 ) {
+		printf("Error: Invalid number of arguments.\n");
+		printf("Usage: %s /dev/input/event0\n", argv[0]);
+		exit(EXIT_FAILURE);
+	}
 
      int fbfd = 0;
      struct fb_var_screeninfo vinfo;
@@ -263,7 +269,7 @@ int main(void) {
 
 	/* init event0 */
 	int fdkey;
-	fdkey = open("/dev/input/event0", O_RDONLY);
+	fdkey = open(argv[0], O_RDONLY);
 	struct input_event evkey;
 
 	int flags = fcntl(fd, F_GETFL, 0);

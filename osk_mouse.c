@@ -36,8 +36,6 @@
 #include <termios.h>
 #include <unistd.h>
 
-#define MOUSEFILE "/dev/input/mouse0"
-
 #define UMBRAL 10
 
 
@@ -154,7 +152,12 @@ static void fb_drawbox(char *fbp, int x1, int y1, int x2, int y2, int bpp, int l
 }
 
 
-int main(void) {
+int main(uint argc, char *argv[]) {
+	if( argc != 2 ) {
+		printf("Error: Invalid number of arguments.\n");
+		printf("Usage: %s /dev/input/mice\n", argv[0]);
+		exit(EXIT_FAILURE);
+	}
 
      int fbfd = 0;
      struct fb_var_screeninfo vinfo;
@@ -246,7 +249,7 @@ int main(void) {
 	int fdm;
 	struct input_event evm;
 
-	if ((fdm = open(MOUSEFILE, O_RDONLY | O_NONBLOCK)) == -1) {
+	if ((fdm = open(argv[1], O_RDONLY | O_NONBLOCK)) == -1) {
 		printf("Device open ERROR\n");
 		exit(EXIT_FAILURE);
 	}
