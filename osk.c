@@ -38,46 +38,9 @@
 #include <unistd.h>
 
 
-/* key codes REFERENCE : from /usr/include/linux/input.h
-#define KEY_Q			16
-#define KEY_W			17
-#define KEY_E			18
-#define KEY_R			19
-#define KEY_T			20
-#define KEY_Y			21
-#define KEY_U			22
-#define KEY_I			23
-#define KEY_O			24
-#define KEY_P			25
-#define KEY_LEFTBRACE		26
-#define KEY_RIGHTBRACE		27
-#define KEY_ENTER		28
-#define KEY_LEFTCTRL		29
-#define KEY_A			30
-#define KEY_S			31
-#define KEY_D			32
-#define KEY_F			33
-#define KEY_G			34
-#define KEY_H			35
-#define KEY_J			36
-#define KEY_K			37
-#define KEY_L			38
-#define KEY_SEMICOLON		39
-#define KEY_APOSTROPHE		40
-#define KEY_GRAVE		41
-#define KEY_LEFTSHIFT		42
-#define KEY_BACKSLASH		43
-#define KEY_Z			44
-#define KEY_X			45
-#define KEY_C			46
-#define KEY_V			47
-#define KEY_B			48
-#define KEY_N			49
-#define KEY_M			50
-*/
 
-
-unsigned char abc[] = {30, 48, 46, 32, 18, 33, 34, 35, 23, 36, 37, 38, 50, 49, 24, 25, 16, 19, 31, 20, 22, 47, 17, 45, 21, 44, 28};
+/* key codes reference in /usr/include/linux/input-event-codes.h */
+unsigned char abc[] = {KEY_A, KEY_B, KEY_C, KEY_D, KEY_E, KEY_F, KEY_G, KEY_H, KEY_I, KEY_J, KEY_K, KEY_L, KEY_M, KEY_N, KEY_O, KEY_P, KEY_Q, KEY_R, KEY_S, KEY_T, KEY_U, KEY_V, KEY_W, KEY_X, KEY_Y, KEY_Z, KEY_ENTER};
 
 extern uint8_t _binary_image_ppm_start[];
 extern uint8_t _binary_image_ppm_end;
