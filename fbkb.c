@@ -8,12 +8,13 @@
  */
 
 #include <stdlib.h>
- #include <unistd.h>
- #include <stdio.h>
- #include <fcntl.h>
- #include <linux/fb.h>
- #include <sys/mman.h>
- #include <sys/ioctl.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <string.h>
+#include <linux/fb.h>
+#include <sys/mman.h>
+#include <sys/ioctl.h>
 
 
 
@@ -139,7 +140,7 @@ static void fb_drawimage(const char *filename, char *fbp, int xo, int yo, int bp
      // Map the device to memory
      fbp = (char *)mmap(0, screensize, PROT_READ | PROT_WRITE, MAP_SHARED,
                         fbfd, 0);
-     if ((int)fbp == -1) {
+     if (fbp == MAP_FAILED) {
          perror("Error: failed to map framebuffer device to memory");
          exit(4);
      }
@@ -164,15 +165,15 @@ static void fb_drawimage(const char *filename, char *fbp, int xo, int yo, int bp
                         (y+vinfo.yoffset) * finfo.line_length;
 
              if (vinfo.bits_per_pixel == 32) {
-                 *(fbp + location) = 100;        // Some blue
+                 *(fbp + location) = (unsigned char) 100; // Some blue
 		if ((j/2)==m) {
-                 *(fbp + location + 1) = 200;     // A little green
-                 *(fbp + location + 2) = 100;    // A lot of red
+                 *(fbp + location + 1) = (unsigned char) 200; // A lot of green
+                 *(fbp + location + 2) = (unsigned char) 100; // A little red
 		} else {
-                 *(fbp + location + 1) = 100;     // A little green
-                 *(fbp + location + 2) = 200;    // A lot of red
+                 *(fbp + location + 1) = (unsigned char) 100; // A little green
+                 *(fbp + location + 2) = (unsigned char) 200; // A lot of red
 		}
-                 *(fbp + location + 3) = 100;      // No transparency
+                 *(fbp + location + 3) = (unsigned char) 100; // No transparency
              } else  { //assume 16bpp
                  int b = 10;
                  int g = (x-100)/6;     // A little green

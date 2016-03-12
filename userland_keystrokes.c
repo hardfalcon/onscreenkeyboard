@@ -17,13 +17,15 @@
  */
 
 #define UINPUT_MAX_NAME_SIZE    80
+#include <stdio.h>
+#include <string.h>
 #include <fcntl.h>
 #include <linux/ioctl.h>
 #include <unistd.h>
 #include <linux/input.h>
 #include <linux/uinput.h>
 
-void main(void){
+int main(int argc, char *argv[]) {
 	int fd;
 	/* Set up a fake keyboard device */
 	fd = open("/dev/uinput", O_WRONLY | O_NONBLOCK); // or /dev/input/uinput

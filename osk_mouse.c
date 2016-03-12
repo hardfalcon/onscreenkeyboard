@@ -35,6 +35,7 @@
 #include <sys/time.h>
 #include <termios.h>
 #include <unistd.h>
+#include <stdbool.h>
 
 #define UMBRAL 10
 
@@ -143,17 +144,17 @@ static void fb_drawbox(char *fbp, int x1, int y1, int x2, int y2, int bpp, int l
 
 			location = (x) * (bpp/8) + (y) * length;
 
-			*(fbp + location) = 100;
-			*(fbp + location + 1) = 100;
-			*(fbp + location + 2) = 200;
-			*(fbp + location + 3) = -1;      /* No transparency */
+			*(fbp + location) = (unsigned char) 100;
+			*(fbp + location + 1) = (unsigned char) 100;
+			*(fbp + location + 2) = (unsigned char) 200;
+			*(fbp + location + 3) = (unsigned char) 255;      /* No transparency */
 
 			}
 
 }
 
 
-int main(uint argc, char *argv[]) {
+int main(int argc, char *argv[]) {
 	if( argc != 2 ) {
 		printf("Error: Invalid number of arguments.\n");
 		printf("Usage: %s /dev/input/mice\n", argv[0]);
@@ -261,10 +262,10 @@ int main(uint argc, char *argv[]) {
 	int absolute_x,absolute_y;
 	/* end init mouse */
 
-	int pressed=0;
-	int pressedk=0;
-
-	int j;
+	bool pressedLeft=0;
+	bool pressedMiddle=0;
+	bool pressedRight=0;
+	size_t pressedKey=0;
 
 	while(1) {
 
@@ -311,15 +312,41 @@ int main(uint argc, char *argv[]) {
 			absolute_y-=ym;
 	
 			if (bLeft==1) {
-				pressed=1;
-				pressedk=(rkp*10)+ckp;
-			} else if ((bLeft==0) && (pressed==1)) {
+				pressedLeft=true;
+				pressedKey=(rkp*10)+ckp;
+			} else if ((bLeft==0) && (pressedLeft==true)) {
 
-				if (abc[pressedk] == 0) break;
-				pressed=0;
-				send_event(fd, EV_KEY, abc[pressedk], 1);
+				if (abc[pressedKey] == 0) break;
+				pressedLeft=false;
+				send_event(fd, EV_KEY, abc[pressedKey], 1);
 				send_event(fd, EV_SYN, SYN_REPORT, 0);
-				send_event(fd, EV_KEY, abc[pressedk], 0);
+				send_event(fd, EV_KEY, abc[pressedKey], 0);
+				send_event(fd, EV_SYN, SYN_REPORT, 0);
+			}
+
+			if (bMiddle==1) {
+				pressedMiddle=true;
+				pressedKey=(rkp*10)+ckp;
+			} else if ((bMiddle==0) && (pressedMiddle==true)) {
+
+				if (abc[pressedKey] == 0) break;
+				pressedMiddle=false;
+				send_event(fd, EV_KEY, abc[pressedKey], 1);
+				send_event(fd, EV_SYN, SYN_REPORT, 0);
+				send_event(fd, EV_KEY, abc[pressedKey], 0);
+				send_event(fd, EV_SYN, SYN_REPORT, 0);
+			}
+
+			if (bRight==1) {
+				pressedRight=true;
+				pressedKey=(rkp*10)+ckp;
+			} else if ((bRight==0) && (pressedRight==true)) {
+
+				if (abc[pressedKey] == 0) break;
+				pressedRight=false;
+				send_event(fd, EV_KEY, abc[pressedKey], 1);
+				send_event(fd, EV_SYN, SYN_REPORT, 0);
+				send_event(fd, EV_KEY, abc[pressedKey], 0);
 				send_event(fd, EV_SYN, SYN_REPORT, 0);
 			}
 

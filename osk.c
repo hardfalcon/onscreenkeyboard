@@ -134,7 +134,7 @@ int send_event(int fd, __u16 type, __u16 code, __s32 value)
 
 
 
-int main( uint argc, char *argv[] ) {
+int main(int argc, char *argv[]) {
 
 	if( argc != 2 ) {
 		printf("Error: Invalid number of arguments.\n");
@@ -257,13 +257,13 @@ int main( uint argc, char *argv[] ) {
 					(y+vinfo.yoffset) * finfo.line_length;
 
 			if (vinfo.bits_per_pixel == 32) {
-				*(fbp + location) = 100;        // Some blue
+				*(fbp + location) = (unsigned char) 100; // Some blue
 				if ((j/2)==m) {
-					*(fbp + location + 1) = 200;     // A little green
-					*(fbp + location + 2) = 100;    // A lot of red
+					*(fbp + location + 1) = (unsigned char) 200; // A lot of green
+					*(fbp + location + 2) = (unsigned char) 100; // A little red
 				} else {
-					*(fbp + location + 1) = 100;     // A little green
-					*(fbp + location + 2) = 200;    // A lot of red
+					*(fbp + location + 1) = (unsigned char) 100; // A little green
+					*(fbp + location + 2) = (unsigned char) 200; // A lot of red
 				}
 				*(fbp + location + 3) = 100;      // No transparency
 			} else  { /* assume 16bpp */
