@@ -1,11 +1,12 @@
+CC      = gcc
+CFLAGS  = -mtune=generic -O2 -pipe -fstack-protector-strong -fstack-check -fPIC -fPIE -s -Wall -Wextra -Wpedantic -Werror=pedantic
 
 all:
-	# gcc -o fbkb fbkb.c
-	# gcc -o key key.c
-	# gcc -o userland_keystrokes userland_keystrokes.c
-	gcc -o osk osk.c
-	gcc -o osk_mouse osk_mouse.c
+	$(CC) $(CFLAGS) -o fbkb fbkb.c
+	$(CC) $(CFLAGS) -o key key.c
+	#$(CC) $(CFLAGS) -o userland_keystrokes userland_keystrokes.c
+	$(CC) $(CFLAGS) -o osk -Wl,--format=binary -Wl,image.ppm -Wl,--format=default osk.c
+	$(CC) $(CFLAGS) -o osk_mouse -Wl,--format=binary -Wl,image_mouse.ppm -Wl,--format=default osk_mouse.c
 
 clean:
-	# rm fbkb key userland_keystrokes osk
-	rm osk osk_mouse
+	rm -f fbkb key userland_keystrokes osk
