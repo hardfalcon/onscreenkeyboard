@@ -7,37 +7,40 @@
  *
  */
 
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
 #include <fcntl.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <linux/fb.h>
-#include <sys/mman.h>
 #include <sys/ioctl.h>
+#include <sys/mman.h>
 
 
+
+extern uint8_t _binary_image_ppm_start[];
+extern uint8_t _binary_image_ppm_end;
+extern uint8_t _binary_image_ppm_size;
 
 
 
 /**
  *	Draw image from PPM file
  */
-static void fb_drawimage(const char *filename, char *fbp, int xo, int yo, int bpp, int length) 
+static void fb_drawimage(FILE *theme_file, char *fbp, int xo, int yo, int bpp, int length) 
 {
 	char head[256];
 	char s[80];
-	FILE *theme_file;
 	unsigned char *pixline;
 	unsigned i, j, width, height, line_size;
 
 	memset(head, 0, sizeof(head));
-	theme_file = fopen(filename, "r");
 
 	// parse ppm header
 	while (1) {
 		if (fgets(s, sizeof(s), theme_file) == NULL) {
-			printf("bad PPM file '%s'", filename);
+			printf("bad PPM file");
 			exit(1);
 		}
 
@@ -45,13 +48,13 @@ static void fb_drawimage(const char *filename, char *fbp, int xo, int yo, int bp
 			continue;
 
 		if (strlen(head) + strlen(s) >= sizeof(head)) {
-			printf("bad PPM file '%s'", filename);
+			printf("bad PPM file");
 			exit(1);
 		}
 
 		strcat(head, s);
 		if (head[0] != 'P' || head[1] != '6') {
-			printf("bad PPM file '%s'", filename);
+			printf("bad PPM file");
 			exit(1);
 		}
 
@@ -73,7 +76,7 @@ static void fb_drawimage(const char *filename, char *fbp, int xo, int yo, int bp
 		unsigned char *pixel = pixline;
 
 		if (fread(pixline, 1, line_size, theme_file) != line_size) {
-			printf("bad PPM file '%s'", filename);
+			printf("bad PPM file");
 			exit(1);
 		}
 
@@ -148,7 +151,9 @@ static void fb_drawimage(const char *filename, char *fbp, int xo, int yo, int bp
 
      x = 300; y = 100;       // Where we are going to put the pixel
 
-    fb_drawimage("image.ppm", fbp, vinfo.xoffset, vinfo.yoffset, vinfo.bits_per_pixel, finfo.line_length);
+    FILE *theme_file=fmemopen(_binary_image_ppm_start, (size_t)&_binary_image_ppm_size, "r");
+    fb_drawimage(theme_file, fbp, vinfo.xoffset, vinfo.yoffset, vinfo.bits_per_pixel, finfo.line_length);
+
 	int j, m=0;
 	while(1) {
 		m++;
