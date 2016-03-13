@@ -41,7 +41,7 @@ static void fb_drawimage(FILE *theme_file, char *fbp, int xo, int yo, int bpp, i
 	while (1) {
 		if (fgets(s, sizeof(s), theme_file) == NULL) {
 			printf("bad PPM file");
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 
 		if (s[0] == '#')
@@ -49,13 +49,13 @@ static void fb_drawimage(FILE *theme_file, char *fbp, int xo, int yo, int bpp, i
 
 		if (strlen(head) + strlen(s) >= sizeof(head)) {
 			printf("bad PPM file");
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 
 		strcat(head, s);
 		if (head[0] != 'P' || head[1] != '6') {
 			printf("bad PPM file");
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 
 		// width, height, max_color_val
@@ -77,7 +77,7 @@ static void fb_drawimage(FILE *theme_file, char *fbp, int xo, int yo, int bpp, i
 
 		if (fread(pixline, 1, line_size, theme_file) != line_size) {
 			printf("bad PPM file");
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 
 		for (i = 0; i < width; i++) {
@@ -119,20 +119,20 @@ static void fb_drawimage(FILE *theme_file, char *fbp, int xo, int yo, int bpp, i
      fbfd = open("/dev/fb0", O_RDWR);
      if (fbfd == -1) {
          perror("Error: cannot open framebuffer device");
-         exit(1);
+         exit(EXIT_FAILURE);
      }
      printf("The framebuffer device was opened successfully.\n");
 
      // Get fixed screen information
      if (ioctl(fbfd, FBIOGET_FSCREENINFO, &finfo) == -1) {
          perror("Error reading fixed information");
-         exit(2);
+         exit(EXIT_FAILURE);
      }
 
      // Get variable screen information
      if (ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo) == -1) {
          perror("Error reading variable information");
-         exit(3);
+         exit(EXIT_FAILURE);
      }
 
      printf("%dx%d, %dbpp\n", vinfo.xres, vinfo.yres, vinfo.bits_per_pixel);
@@ -145,7 +145,7 @@ static void fb_drawimage(FILE *theme_file, char *fbp, int xo, int yo, int bpp, i
                         fbfd, 0);
      if (fbp == MAP_FAILED) {
          perror("Error: failed to map framebuffer device to memory");
-         exit(4);
+         exit(EXIT_FAILURE);
      }
      printf("The framebuffer device was mapped to memory successfully.\n");
 
